@@ -27,6 +27,21 @@ public class Player : MonoBehaviour
     [SerializeField, ReadOnly] private bool isGrounded;
 
     bool isGameStarted = false;
+    public bool IsGameStarted => isGameStarted;
+
+    private static Player _instance;
+    public static Player Instance => _instance;
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -66,7 +81,9 @@ public class Player : MonoBehaviour
             move = 1f;
 
         if (move != 0f)
-            rb.linearVelocity = new Vector3(move * moveSpeed, rb.linearVelocity.y, 0);
+            MoveHorizontal(move);
+        else
+            StopHorizontal();
 
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && isGrounded)
             Jump();
@@ -77,7 +94,10 @@ public class Player : MonoBehaviour
 
     void HandleTouchInput()
     {
-        if (Input.touchCount == 0) return;
+        if (Input.touchCount == 0) {
+            StopHorizontal(); // No touch, so stop movement
+            return;
+        }
 
         Touch touch = Input.GetTouch(0);
 
@@ -88,15 +108,18 @@ public class Player : MonoBehaviour
         else if (touch.phase == TouchPhase.Ended)
         {
             Vector2 delta = touch.position - touchStartPos;
-            if (delta.magnitude < 50f) return; // Ignore small swipes
+            if (delta.magnitude < 50f) {
+                StopHorizontal();
+                return; // Ignore small swipes
+            }
 
             if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
             {
                 // Horizontal swipe
                 if (delta.x > 0)
-                    rb.linearVelocity = new Vector3(moveSpeed, rb.linearVelocity.y, 0); // Right
+                    MoveHorizontal(1f); // Right
                 else
-                    rb.linearVelocity = new Vector3(-moveSpeed, rb.linearVelocity.y, 0); // Left
+                    MoveHorizontal(-1f); // Left
             }
             else
             {
@@ -107,6 +130,17 @@ public class Player : MonoBehaviour
                     PullDown();
             }
         }
+    }
+
+    // Movement functions
+    void MoveHorizontal(float direction)
+    {
+        rb.linearVelocity = new Vector3(direction * moveSpeed, rb.linearVelocity.y, 0);
+    }
+
+    void StopHorizontal()
+    {
+        rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
     }
 
     void Jump()
