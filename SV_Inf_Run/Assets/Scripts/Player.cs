@@ -150,12 +150,12 @@ public class Player : MonoBehaviour
     void Jump()
     {
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, 0);
-        if (animator) animator.SetTrigger(jumpTrigger);
+        PlayJumpAnimation();
     }
 
     void PullDown()
     {
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, -jumpForce, 0);
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, -jumpForce*1.5f, 0);
     }
     bool isJumpAutoCalled = false;
     void CheckGrounded()
@@ -170,14 +170,38 @@ public class Player : MonoBehaviour
         if (isGrounded && !wasGrounded) // just landed
         {
             isJumpAutoCalled = false;
-            animator.ResetTrigger(jumpTrigger);
-            if (animator) animator.SetTrigger(runTrigger);
-
+            PlayRunAnimation();
         }
         if (!isGrounded && !isJumpAutoCalled)
         {
             isJumpAutoCalled = true;
-            if (animator) animator.SetTrigger(jumpTrigger);
+            PlayJumpAnimation();
+        }
+    }
+
+    // Animation trigger methods
+    public void PlayRunAnimation()
+    {
+        if (animator)
+        {
+            animator.ResetTrigger(jumpTrigger);
+            animator.SetTrigger(runTrigger);
+        }
+    }
+
+    public void PlayJumpAnimation()
+    {
+        if (animator)
+        {
+            animator.SetTrigger(jumpTrigger);
+        }
+    }
+
+    public void PlayFallAnimation()
+    {
+        if (animator)
+        {
+            animator.SetTrigger(fallTrigger);
         }
     }
 
@@ -186,8 +210,7 @@ public class Player : MonoBehaviour
         if (other.TryGetComponent<Obstacle>(out Obstacle obstacle))
         {
             // Handle collision with obstacle
-          //  Debug.LogError("Player hit an obstacle!");
-            if (animator) animator.SetTrigger(fallTrigger);
+            PlayFallAnimation();
             GameManager.Instance.SetGameState(GameState.GameOver);
         }
     }

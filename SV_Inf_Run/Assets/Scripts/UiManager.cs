@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UiManager : MonoBehaviour
@@ -12,6 +13,7 @@ public class UiManager : MonoBehaviour
 
     public Action<int> onScoreUpdate;
     public Action<int> onGemUpdate;
+    public Action sceneRestart;
 
     Vector3 gemUiWorldPosition;
     public Vector3 GemCanvasPosition => gemUiWorldPosition;
@@ -44,6 +46,7 @@ public class UiManager : MonoBehaviour
 
         onScoreUpdate += ScoreUpdate;
         onGemUpdate += GemUpdate;
+        sceneRestart += RestartScene;
 
     }
 
@@ -51,6 +54,7 @@ public class UiManager : MonoBehaviour
     {
         onScoreUpdate -= ScoreUpdate;
         onGemUpdate -= GemUpdate;
+        sceneRestart -= RestartScene;
     }
     void ScoreUpdate(int score)
     {
@@ -59,5 +63,10 @@ public class UiManager : MonoBehaviour
     void GemUpdate(int gemCount)
     {
         gemText.text = gemCount.ToString();
+    }
+
+    void RestartScene()
+    {
+       SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

@@ -93,12 +93,7 @@ public class GameManager : MonoBehaviour
     void ApplyDifficulty(LevelDifficulty difficulty)
     {
         // landMoveSpeed = difficulty.landMoveSpeed;
-        DOTween.To(() => landMoveSpeed, x => landMoveSpeed = x, difficulty.landMoveSpeed, 1.5f)
-        .OnUpdate(() =>
-        {
-            Debug.LogError("Land Move Speed: " + landMoveSpeed);
-        })
-        ;
+        DOTween.To(() => landMoveSpeed, x => landMoveSpeed = x, difficulty.landMoveSpeed, 1.5f);
         scoreIncreaseTimer = difficulty.scoreIncreaseTimeInterval;
         // Score increase interval or onno property o ekhane set korte paren
     }
@@ -107,7 +102,7 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         {
-            if (currentState != GameState.Playing)
+            if (currentState != GameState.Playing || !Player.Instance.IsGameStarted)
             {
                 yield return null;
                 continue;
@@ -159,6 +154,14 @@ public class GameManager : MonoBehaviour
         lastLand.transform.rotation = lastLand.transform.rotation;
         //Debug.Break();
 
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            UiManager.Instance.sceneRestart?.Invoke();
+        }
     }
 
     void FixedUpdate()
