@@ -17,3 +17,7 @@ MonoBehaviour:
     maxSpawnCount: 2
   - landPrefab: {fileID: 1811542796966636657, guid: f2cb34696ee1ad9468dda4b137467a60, type: 3}
     maxSpawnCount: 2
+  - landPrefab: {fileID: 4718305340679665534, guid: 73a2a9b970eccc74fadfdadfc20866fc, type: 3}
+    maxSpawnCount: 2
+  - landPrefab: {fileID: 1811542796966636657, guid: e8fa070ee444d77499c599dc97687382, type: 3}
+    maxSpawnCount: 2

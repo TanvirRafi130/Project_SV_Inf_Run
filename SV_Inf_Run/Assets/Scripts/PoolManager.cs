@@ -6,10 +6,12 @@ public class PoolManager : MonoBehaviour
 
     [Header("SO Data")]
     [SerializeField] LandDataSo landDataSo;
+    [SerializeField] GemDataSo gemDataSo;
 
     // Pooling system for objects
     // private Dictionary<GameObject, Queue<GameObject>> _poolDictionary = new Dictionary<GameObject, Queue<GameObject>>();  // unnecessary complexity for now
     List<GameObject> lands = new List<GameObject>();
+    Queue<GameObject> gems = new Queue<GameObject>();
     // Singleton instance
     private static PoolManager _instance;
     public static PoolManager Instance => _instance;
@@ -24,12 +26,11 @@ public class PoolManager : MonoBehaviour
         {
             _instance = this;
         }
+
+        CreateLandObject();
+        CreateGemObject();
     }
 
-    private void Start()
-    {
-        CreateLandObject();
-    }
 
     void CreateLandObject()
     {
@@ -63,8 +64,37 @@ public class PoolManager : MonoBehaviour
         land.SetActive(false);
         lands.Add(land);
     }
+    void CreateGemObject()
+    {
+        foreach (var gem in gemDataSo.gemEntries)
+        {
+            for (int i = 0; i < gem.spawnAmountInPool; i++)
+            {
+                GameObject obj = Instantiate(gem.gemPrefab);
+                obj.SetActive(false);
+                gems.Enqueue(obj);
+            }
+        }
+    }
 
+    public GameObject GetPooledGem()
+    {
+        if (gems.Count == 0)
+        {
+            Debug.LogError("No gem available in pool!");
+            return null;
+        }
+        var gem = gems.Dequeue();
+        gem.SetActive(true);
+        return gem;
+    }
 
-
+    public void ReturnGemToPool(GameObject gem)
+    {
+        if (gem == null) return;
+        gem.SetActive(false);
+        gem.transform.localScale = Vector3.one;
+        gems.Enqueue(gem);
+    }
 
 }

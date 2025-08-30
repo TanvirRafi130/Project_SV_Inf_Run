@@ -63,6 +63,8 @@ public class Player : MonoBehaviour
 
         if (!isGameStarted) return;
 
+        if (GameManager.Instance.GameState != GameState.Playing) return;
+
 #if UNITY_IOS || UNITY_ANDROID
         HandleTouchInput();
 #else
@@ -94,7 +96,8 @@ public class Player : MonoBehaviour
 
     void HandleTouchInput()
     {
-        if (Input.touchCount == 0) {
+        if (Input.touchCount == 0)
+        {
             StopHorizontal(); // No touch, so stop movement
             return;
         }
@@ -108,7 +111,8 @@ public class Player : MonoBehaviour
         else if (touch.phase == TouchPhase.Ended)
         {
             Vector2 delta = touch.position - touchStartPos;
-            if (delta.magnitude < 50f) {
+            if (delta.magnitude < 50f)
+            {
                 StopHorizontal();
                 return; // Ignore small swipes
             }
@@ -153,7 +157,7 @@ public class Player : MonoBehaviour
     {
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, -jumpForce, 0);
     }
-
+    bool isJumpAutoCalled = false;
     void CheckGrounded()
     {
         Vector3 pos = transform.position;
@@ -165,7 +169,26 @@ public class Player : MonoBehaviour
 
         if (isGrounded && !wasGrounded) // just landed
         {
+            isJumpAutoCalled = false;
+            animator.ResetTrigger(jumpTrigger);
             if (animator) animator.SetTrigger(runTrigger);
+
+        }
+        if (!isGrounded && !isJumpAutoCalled)
+        {
+            isJumpAutoCalled = true;
+            if (animator) animator.SetTrigger(jumpTrigger);
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent<Obstacle>(out Obstacle obstacle))
+        {
+            // Handle collision with obstacle
+          //  Debug.LogError("Player hit an obstacle!");
+            if (animator) animator.SetTrigger(fallTrigger);
+            GameManager.Instance.SetGameState(GameState.GameOver);
         }
     }
 
