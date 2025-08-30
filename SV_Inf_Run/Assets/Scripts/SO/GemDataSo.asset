@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gemEntries:
   - gemName: Diamond
-    gemPointValue: 10
+    gemPointValue: 2
     gemPrefab: {fileID: 8293504873452435346, guid: 4d98d5493b9495d4b88a4382d71e20b4, type: 3}
-    spawnAmountInPool: 1000
+    spawnAmountInPool: 500

@@ -71,6 +71,7 @@ public class PoolManager : MonoBehaviour
             for (int i = 0; i < gem.spawnAmountInPool; i++)
             {
                 GameObject obj = Instantiate(gem.gemPrefab);
+                obj.GetComponent<Gem>().scoreValue = gem.gemPointValue;
                 obj.SetActive(false);
                 gems.Enqueue(obj);
             }
@@ -81,7 +82,7 @@ public class PoolManager : MonoBehaviour
     {
         if (gems.Count == 0)
         {
-            Debug.LogError("No gem available in pool!");
+            //Debug.LogError("No gem available in pool!");
             return null;
         }
         var gem = gems.Dequeue();

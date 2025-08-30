@@ -14,9 +14,12 @@ public class Obstacle : MonoBehaviour
 
     Vector3 localA;
     Vector3 localB;
-
+    Sequence seq;
+    Tween rotateTween;
     private void Start()
     {
+        GameManager.Instance.tweenPause += OnPause;
+        GameManager.Instance.tweenResume += OnResume;
         switch (obstacleType)
         {
             case ObstacleType.Moving:
@@ -29,15 +32,29 @@ public class Obstacle : MonoBehaviour
                 break;
         }
     }
-
-    private void OnEnable()
+    private void OnDestroy()
     {
+        GameManager.Instance.tweenPause -= OnPause;
+        GameManager.Instance.tweenResume -= OnResume;
 
     }
 
+    public void OnPause()
+    {
+        rotateTween?.Pause();
+        seq?.Pause();
+    }
+    public void OnResume()
+    {
+        rotateTween?.Play();
+        seq?.Play();
+    }
+
+
+
     void MovingObstacle()
     {
-        Sequence seq = DOTween.Sequence();
+        seq = DOTween.Sequence();
         seq.Append(spike.transform.DOLocalMove(pointA.localPosition, moveTime / 2f).SetEase(Ease.InOutSine));
         //seq.Append(spike.transform.DOMove(pointB.position, moveTime / 2f).SetEase(Ease.InOutSine));
         seq.SetLoops(-1, LoopType.Yoyo);
@@ -45,9 +62,9 @@ public class Obstacle : MonoBehaviour
 
     void RotatingObstacle()
     {
-        transform.DORotate(new Vector3(0, 360, 0), 2f, RotateMode.FastBeyond360)
-            .SetLoops(-1, LoopType.Incremental)
-            .SetEase(Ease.Linear);
+        rotateTween = transform.DORotate(new Vector3(0, 360, 0), 2f, RotateMode.FastBeyond360)
+              .SetLoops(-1, LoopType.Incremental)
+              .SetEase(Ease.Linear);
     }
 
 #if UNITY_EDITOR

@@ -5,6 +5,7 @@ public class Gem : MonoBehaviour
 {
 
     public Land myLand; // Reference to the Land this gem belongs to
+    public int scoreValue;
     Vector3 pos = new Vector3(0, 0, 0);
     private void Start()
     {
@@ -33,7 +34,7 @@ public class Gem : MonoBehaviour
             })
             .OnComplete(() =>
             {
-                GameManager.Instance.onGemCollect?.Invoke();
+                GameManager.Instance.onGemCollect?.Invoke(scoreValue);
                 PoolManager.Instance.ReturnGemToPool(this.gameObject);
             });
         }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using NaughtyAttributes;
+using System;
 
 public class Player : MonoBehaviour
 {
@@ -25,7 +26,8 @@ public class Player : MonoBehaviour
 
     private Vector2 touchStartPos;
     [SerializeField, ReadOnly] private bool isGrounded;
-
+    public Action onGameHalt;
+    public Action onGameResume;
     bool isGameStarted = false;
     public bool IsGameStarted => isGameStarted;
 
@@ -46,9 +48,15 @@ public class Player : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        onGameHalt += GamePaused;
+        onGameResume += GameResume;
     }
 
+    private void OnDestroy()
+    {
+        onGameHalt -= GamePaused;
+        onGameResume -= GameResume;
+    }
     // Update is called once per frame
     void Update()
     {
@@ -96,6 +104,41 @@ public class Player : MonoBehaviour
 
     void HandleTouchInput()
     {
+        // #if UNITY_EDITOR // Uncomment if you want this only in Editor
+        // Mouse swipe simulation for testing without touch
+        if (Input.GetMouseButtonDown(0))
+        {
+            touchStartPos = Input.mousePosition;
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            Vector2 delta = (Vector2)Input.mousePosition - touchStartPos;
+            if (delta.magnitude < 50f)
+            {
+                StopHorizontal();
+                return; // Ignore small swipes
+            }
+
+            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+            {
+                // Horizontal swipe
+                if (delta.x > 0)
+                    MoveHorizontal(1f); // Right
+                else
+                    MoveHorizontal(-1f); // Left
+            }
+            else
+            {
+                // Vertical swipe
+                if (delta.y > 0 && isGrounded)
+                    Jump();
+                else if (delta.y < 0)
+                    PullDown();
+            }
+        }
+        // #else
+        /*
+        // Touch input for mobile
         if (Input.touchCount == 0)
         {
             StopHorizontal(); // No touch, so stop movement
@@ -134,6 +177,19 @@ public class Player : MonoBehaviour
                     PullDown();
             }
         }
+        */
+        // #endif
+    }
+
+    void GamePaused()
+    {
+        animator.speed = 0;
+        rb.Sleep();
+    }
+    void GameResume()
+    {
+        animator.speed = 1;
+        rb.WakeUp();
     }
 
     // Movement functions
@@ -207,11 +263,13 @@ public class Player : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent<Obstacle>(out Obstacle obstacle))
+        if (other.TryGetComponent<Obstacle>(out Obstacle obstacle) && GameManager.Instance.GameState == GameState.Playing)
         {
             // Handle collision with obstacle
             PlayFallAnimation();
-            GameManager.Instance.SetGameState(GameState.GameOver);
+            //GameManager.Instance.SetGameState(GameState.GameOver);
+            //GameManager.Instance.onGameStateChange?.Invoke(GameState.GameOver);
+            GameManager.Instance.onGameStateChange?.Invoke(GameState.GameOver);
         }
     }
 

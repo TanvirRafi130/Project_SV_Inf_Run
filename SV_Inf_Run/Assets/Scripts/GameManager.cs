@@ -25,7 +25,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameState currentState = GameState.Playing;
     public GameState GameState => currentState;
 
-    public Action onGemCollect;
+    public Action<int> onGemCollect;
+    public Action<GameState> onGameStateChange;
+    public Action tweenPause;
+    public Action tweenResume;
+
 
     int currentScore = 0;
     int currentGemCount = 0;
@@ -56,15 +60,22 @@ public class GameManager : MonoBehaviour
         StartCoroutine(DifficultyRoutine());
         StartCoroutine(ScoreIncreaseRoutine());
         onGemCollect += OnGemCollected;
+        onGameStateChange += SetGameState;
+
+        currentGemCount = SaveManager.Instance.GetGemCount();
+        UiManager.Instance.onGemUpdate?.Invoke(currentGemCount);
     }
     private void OnDestroy()
     {
         onGemCollect -= OnGemCollected;
+        onGameStateChange -= SetGameState;
     }
 
-    void OnGemCollected()
+    void OnGemCollected(int scoreAdd)
     {
         currentGemCount++;
+        currentScore += scoreAdd;
+        UiManager.Instance.onScoreUpdate?.Invoke(currentScore);
         UiManager.Instance.onGemUpdate?.Invoke(currentGemCount);
     }
 
@@ -92,7 +103,6 @@ public class GameManager : MonoBehaviour
 
     void ApplyDifficulty(LevelDifficulty difficulty)
     {
-        // landMoveSpeed = difficulty.landMoveSpeed;
         DOTween.To(() => landMoveSpeed, x => landMoveSpeed = x, difficulty.landMoveSpeed, 1.5f);
         scoreIncreaseTimer = difficulty.scoreIncreaseTimeInterval;
         // Score increase interval or onno property o ekhane set korte paren
@@ -113,9 +123,33 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SetGameState(GameState newState)
+    void SetGameState(GameState newState)
     {
         currentState = newState;
+
+        switch (currentState)
+        {
+            case GameState.Halt:
+
+                Player.Instance.onGameHalt?.Invoke();
+                tweenPause?.Invoke();
+                break;
+            case GameState.Playing:
+                Player.Instance.onGameResume?.Invoke();
+                tweenResume?.Invoke();
+                break;
+            case GameState.GameOver:
+                tweenPause?.Invoke();
+                bool isHighScore = currentScore > SaveManager.Instance.GetHighScore();
+                UiManager.Instance.onGameOverPanelOpen?.Invoke(isHighScore);
+                SaveManager.Instance.SetGemCount(currentGemCount);
+                if (isHighScore)
+                {
+                    SaveManager.Instance.SetHighScore(currentScore);
+                }
+                break;
+
+        }
     }
 
     public void AddLandToMove(GameObject land)
@@ -161,6 +195,10 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             UiManager.Instance.sceneRestart?.Invoke();
+        }
+        if (Input.GetKeyDown(KeyCode.Escape) && currentState != GameState.GameOver)
+        {
+            UiManager.Instance.onPausePanelOpen?.Invoke();
         }
     }
 

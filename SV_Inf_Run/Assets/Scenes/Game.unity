@@ -270,6 +270,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 72759349}
   m_CullTransparentMesh: 1
+--- !u!1 &77718827
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 77718829}
+  - component: {fileID: 77718828}
+  m_Layer: 0
+  m_Name: SaveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &77718828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 77718827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4038cd096c1bb1d43811a67ff93a1059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &77718829
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 77718827}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &179780028
 GameObject:
   m_ObjectHideFlags: 0
@@ -946,10 +990,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c46445a02b78c144ea6bf4e7f061cbfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pausePanel: {fileID: 780893482}
+  gameOverPanel: {fileID: 1282980090}
+  pauseButton: {fileID: 732418372}
+  resumeButtonPausePanel: {fileID: 1353398019}
+  restartButtonPausePanel: {fileID: 628706203}
+  restartButtonGameOverPanel: {fileID: 1120736743}
   gemCanvasPosition: {fileID: 72759350}
   canvasRectTransform: {fileID: 708339157}
   scoreText: {fileID: 184987891}
   gemText: {fileID: 343175913}
+  finalPosition: {x: 0, y: -685, z: 0}
+  finalFontSize: 200
+  time: 1
 --- !u!4 &390888359
 Transform:
   m_ObjectHideFlags: 0
@@ -2105,7 +2158,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1282980090}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -3384,3 +3437,4 @@ SceneRoots:
   - {fileID: 708339157}
   - {fileID: 1958618646}
   - {fileID: 390888359}
+  - {fileID: 77718829}
